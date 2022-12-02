@@ -11,8 +11,8 @@ fn main() {
     let stdin = io::stdin();
     let mut line = String::new();
 
-    let mut sum = 0; // Local sum
-    let mut max = 0; // Current maximum
+    let mut calories = Vec::new(); // Calories for each elf
+    let mut current = 0; // Sum of calories for the current elf
 
     loop {
         // Read the line from stdin and determine the record type
@@ -32,13 +32,11 @@ fn main() {
 
         // Process the record
         match record {
-            LineInput::Value(x) => sum += x,
+            LineInput::Value(x) => current += x,
 
             _ => {
-                if sum > max {
-                    max = sum;
-                }
-                sum = 0;
+                calories.push(current);
+                current = 0;
             }
         };
 
@@ -50,5 +48,10 @@ fn main() {
         line.clear();
     }
 
-    println!("{max}");
+    // Sum the top three elves' calories
+    calories.sort();
+    match &calories[..] {
+        [.., a, b, c] => println!("{}", a + b + c),
+        _ => panic!("Not enough elves"),
+    };
 }
