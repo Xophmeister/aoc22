@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub enum Hand {
     Rock,
     Paper,
@@ -15,7 +16,19 @@ impl Hand {
         }
     }
 
-    pub fn score(&self) -> u32 {
+    pub fn beats_with(self) -> Self {
+        match self {
+            Hand::Rock => Hand::Scissors,
+            Hand::Paper => Hand::Rock,
+            Hand::Scissors => Hand::Paper,
+        }
+    }
+
+    pub fn beaten_by(self) -> Self {
+        self.beats_with().beats_with()
+    }
+
+    pub fn score(self) -> u32 {
         match self {
             Hand::Rock => 1,
             Hand::Paper => 2,

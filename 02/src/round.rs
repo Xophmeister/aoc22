@@ -18,7 +18,10 @@ impl Round {
         }
     }
 
-    pub fn score(&self) -> u32 {
-        self.strategy.play(&self.opponent).score() + self.strategy.score()
+    pub fn score(self) -> u32 {
+        let strategy = self.strategy;
+        let hand = strategy.play(self.opponent);
+
+        hand.score() + strategy.score()
     }
 }

@@ -1,5 +1,6 @@
 use crate::hand::Hand;
 
+#[derive(Copy, Clone)]
 pub enum Strategy {
     Win,
     Lose,
@@ -17,7 +18,7 @@ impl Strategy {
         }
     }
 
-    pub fn score(&self) -> u32 {
+    pub fn score(self) -> u32 {
         match self {
             Strategy::Win => 6,
             Strategy::Draw => 3,
@@ -25,23 +26,11 @@ impl Strategy {
         }
     }
 
-    pub fn play(&self, opponent: &Hand) -> Hand {
-        // TODO There's something quite unsatisfying about enumerating everything...
-        match (self, opponent) {
-            // Winning strategies
-            (Strategy::Win, Hand::Rock) => Hand::Paper,
-            (Strategy::Win, Hand::Paper) => Hand::Scissors,
-            (Strategy::Win, Hand::Scissors) => Hand::Rock,
-
-            // Drawing strategies
-            (Strategy::Draw, Hand::Rock) => Hand::Rock,
-            (Strategy::Draw, Hand::Paper) => Hand::Paper,
-            (Strategy::Draw, Hand::Scissors) => Hand::Scissors,
-
-            // Losing strategies
-            (Strategy::Lose, Hand::Rock) => Hand::Scissors,
-            (Strategy::Lose, Hand::Paper) => Hand::Rock,
-            (Strategy::Lose, Hand::Scissors) => Hand::Paper,
+    pub fn play(self, opponent: Hand) -> Hand {
+        match self {
+            Strategy::Win => opponent.beaten_by(),
+            Strategy::Draw => opponent,
+            Strategy::Lose => opponent.beats_with(),
         }
     }
 }
