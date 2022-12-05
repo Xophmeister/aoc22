@@ -13,10 +13,28 @@ fn test_rucksack_compartments() {
 
 #[test]
 fn test_common_item() {
-    assert_eq!(common_item(("a", "a")), Some('a'));
-    assert_eq!(common_item(("vJrwpWtwJgWr", "hcsFMMfFFhFp")), Some('p'));
-    assert_eq!(common_item(("abc", "ABC")), None);
-    assert_eq!(common_item(("abc", "abc")), None);
+    assert_eq!(common_item(vec!["a", "a"]), Some('a'));
+    assert_eq!(common_item(vec!["vJrwpWtwJgWr", "hcsFMMfFFhFp"]), Some('p'));
+    assert_eq!(common_item(vec!["abc", "ABC"]), None);
+    assert_eq!(common_item(vec!["abc", "abc"]), None);
+
+    assert_eq!(
+        common_item(vec![
+            "vJrwpWtwJgWrhcsFMMfFFhFp",
+            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+            "PmmdzqPrVvPwwTWBwg",
+        ]),
+        Some('r')
+    );
+
+    assert_eq!(
+        common_item(vec![
+            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+            "ttgJtRGJQctTZtZT",
+            "CrZsJsPPZsGzwwsLwLmpwMDw",
+        ]),
+        Some('Z')
+    );
 }
 
 #[test]

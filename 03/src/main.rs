@@ -11,17 +11,20 @@ fn rucksack_compartments(rucksack: &str) -> (&str, &str) {
     (&rucksack[..len / 2], &rucksack[len / 2..])
 }
 
-fn common_item(compartments: (&str, &str)) -> Option<char> {
-    // Find the single common item (if any) contained in each compartment
-    let (left, right) = compartments;
-    let a: HashSet<char> = HashSet::from_iter(left.chars());
-    let b: HashSet<char> = HashSet::from_iter(right.chars());
+fn common_item(collections: Vec<&str>) -> Option<char> {
+    // Find the single common item (if any) amongst N collections of items
+    let mut items: Vec<HashSet<char>> = collections
+        .iter()
+        .map(|collection| HashSet::from_iter(collection.chars()))
+        .collect();
 
-    // common.first() returns Option<&&char>; applying .cloned() twice gets us the correct type,
-    // but doesn't have the correct behaviour when there are multiple common items.
-    let common: Vec<&char> = a.intersection(&b).collect();
-    match common.len() {
-        1 => Some(common[0].clone()),
+    // From https://stackoverflow.com/a/65175232/876937
+    let mut common = items.pop().unwrap();
+    common.retain(|item| items.iter().all(|set| set.contains(item)));
+
+    let item = Vec::from_iter(common);
+    match item.len() {
+        1 => Some(item[0]),
         _ => None,
     }
 }
@@ -37,30 +40,53 @@ fn item_priority(item: char) -> u32 {
     }
 }
 
-fn rucksack_priority(rucksack: &str) -> u32 {
-    if let Some(item) = common_item(rucksack_compartments(rucksack)) {
+fn group_priority(collections: Vec<&str>) -> u32 {
+    if let Some(item) = common_item(collections) {
         item_priority(item)
     } else {
         panic!("No common item")
     }
 }
 
+fn rucksack_priority(rucksack: &str) -> u32 {
+    let (left, right) = rucksack_compartments(rucksack);
+    group_priority(vec![left, right])
+}
+
 fn main() {
     let stdin = io::stdin();
     let mut line = String::new();
 
-    let mut sum = 0;
+    let mut sum_a = 0; // Answer for part 1
+    let mut sum_b = 0; // Answer for part 2
+
+    let mut group: Vec<String> = Vec::new();
 
     loop {
-        sum += match stdin.read_line(&mut line) {
+        match stdin.read_line(&mut line) {
             Ok(0) => break,
-            Ok(_) => rucksack_priority(&line.trim()),
-
             Err(e) => panic!("{e}"),
+
+            Ok(_) => {
+                let record = line.trim();
+
+                // Part 1
+                sum_a += rucksack_priority(record);
+
+                // Part 2
+                // TODO There's probably a better way of doing this!
+                group.push(String::from(record));
+                if group.len() == 3 {
+                    let group_ref: Vec<&str> = group.iter().map(|elf| elf.as_str()).collect();
+                    sum_b += group_priority(group_ref);
+                    group.clear();
+                }
+            }
         };
 
         line.clear();
     }
 
-    println!("{sum}");
+    println!("Part 1: {sum_a}");
+    println!("Part 2: {sum_b}");
 }
