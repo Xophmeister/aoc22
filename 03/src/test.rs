@@ -16,6 +16,7 @@ fn test_common_item() {
     assert_eq!(common_item(("a", "a")), Some('a'));
     assert_eq!(common_item(("vJrwpWtwJgWr", "hcsFMMfFFhFp")), Some('p'));
     assert_eq!(common_item(("abc", "ABC")), None);
+    assert_eq!(common_item(("abc", "abc")), None);
 }
 
 #[test]

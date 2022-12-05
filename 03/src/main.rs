@@ -16,9 +16,10 @@ fn common_item(compartments: (&str, &str)) -> Option<char> {
     let (left, right) = compartments;
     let a: HashSet<char> = HashSet::from_iter(left.chars());
     let b: HashSet<char> = HashSet::from_iter(right.chars());
-    let common: Vec<&char> = a.intersection(&b).collect();
 
-    // common.first() doesn't work because it returns Option<&&char>
+    // common.first() returns Option<&&char>; applying .cloned() twice gets us the correct type,
+    // but doesn't have the correct behaviour when there are multiple common items.
+    let common: Vec<&char> = a.intersection(&b).collect();
     match common.len() {
         1 => Some(common[0].clone()),
         _ => None,
