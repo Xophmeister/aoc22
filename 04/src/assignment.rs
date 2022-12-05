@@ -15,6 +15,10 @@ impl Assignment {
     pub fn contains(&self, other: &Self) -> bool {
         self.0 <= other.0 && self.1 >= other.1
     }
+
+    pub fn overlaps(&self, other: &Self) -> bool {
+        (other.0 >= self.0 && other.0 <= self.1) || (other.1 >= self.0 && other.1 <= self.1)
+    }
 }
 
 #[cfg(test)]

@@ -9,7 +9,8 @@ fn main() {
     let stdin = io::stdin();
     let mut line = String::new();
 
-    let mut count = 0;
+    let mut count_a = 0; // Count for part 1
+    let mut count_b = 0; // Count for part 2
 
     loop {
         match stdin.read_line(&mut line) {
@@ -17,8 +18,14 @@ fn main() {
             Err(e) => panic!("{e}"),
 
             Ok(_) => {
-                if Record::from_str(line.trim()).map_or(false, |v| v.redundant()) {
-                    count += 1;
+                let record = Record::from_str(line.trim()).unwrap();
+
+                if record.redundant() {
+                    count_a += 1;
+                }
+
+                if record.overlaps() {
+                    count_b += 1;
                 }
             }
         };
@@ -26,5 +33,6 @@ fn main() {
         line.clear()
     }
 
-    println!("{count}");
+    println!("Part 1: {count_a}");
+    println!("Part 2: {count_b}");
 }

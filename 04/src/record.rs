@@ -16,6 +16,10 @@ impl Record {
     pub fn redundant(&self) -> bool {
         self.0.contains(&self.1) || self.1.contains(&self.0)
     }
+
+    pub fn overlaps(&self) -> bool {
+        self.0.overlaps(&self.1) || self.1.overlaps(&self.0)
+    }
 }
 
 #[cfg(test)]
