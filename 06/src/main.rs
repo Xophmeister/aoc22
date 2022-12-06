@@ -1,23 +1,24 @@
 use std::collections::HashSet;
 use std::io;
 
-const MARKER_SIZE: usize = 4;
+const PKT_MARKER_SIZE: usize = 4;
+const MSG_MARKER_SIZE: usize = 14;
 
 fn unique_characters(input: &str) -> usize {
     let chars: HashSet<char> = HashSet::from_iter(input.chars());
     chars.len()
 }
 
-fn find_start(input: &str) -> Result<usize, &str> {
+fn find_start(input: &str, marker_size: usize) -> Result<usize, &str> {
     let length = input.len();
 
-    if length < MARKER_SIZE {
+    if length < marker_size {
         return Err("Input too short");
     }
 
-    for idx in MARKER_SIZE..=length {
-        let frame = &input[idx - MARKER_SIZE..idx];
-        if unique_characters(frame) == MARKER_SIZE {
+    for idx in marker_size..=length {
+        let frame = &input[idx - marker_size..idx];
+        if unique_characters(frame) == marker_size {
             return Ok(idx);
         }
     }
@@ -32,8 +33,19 @@ fn main() {
     loop {
         match stdin.read_line(&mut line) {
             Ok(0) => break,
-            Ok(_) => println!("{}", find_start(line.trim()).unwrap()),
             Err(_) => panic!("Parse error!"),
+
+            Ok(_) => {
+                println!(
+                    "Part 1: {}",
+                    find_start(line.trim(), PKT_MARKER_SIZE).unwrap()
+                );
+
+                println!(
+                    "Part 2: {}",
+                    find_start(line.trim(), MSG_MARKER_SIZE).unwrap()
+                );
+            }
         };
 
         line.clear();
@@ -45,10 +57,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_find_start() {
-        assert_eq!(find_start("bvwbjplbgvbhsrlpgdmjqwftvncz").unwrap(), 5);
-        assert_eq!(find_start("nppdvjthqldpwncqszvftbrmjlhg").unwrap(), 6);
-        assert_eq!(find_start("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg").unwrap(), 10);
-        assert_eq!(find_start("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw").unwrap(), 11);
+    fn packet_start() {
+        let cases = vec![
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 5),
+            ("nppdvjthqldpwncqszvftbrmjlhg", 6),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11),
+        ];
+
+        for (input, expected) in cases {
+            assert_eq!(find_start(input, PKT_MARKER_SIZE).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn message_start() {
+        let cases = vec![
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
+            ("nppdvjthqldpwncqszvftbrmjlhg", 23),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+        ];
+
+        for (input, expected) in cases {
+            assert_eq!(find_start(input, MSG_MARKER_SIZE).unwrap(), expected);
+        }
     }
 }
