@@ -21,9 +21,14 @@ lazy_static! {
     .unwrap();
 }
 
+pub enum Model {
+    CrateMover9000,
+    CrateMover9001,
+}
+
 #[derive(Debug)]
 pub struct Crane {
-    pub crates: u32,
+    pub crates: usize,
     pub from: usize,
     pub to: usize,
 }
@@ -42,11 +47,21 @@ impl FromStr for Crane {
 }
 
 impl Crane {
-    pub fn apply<T>(&self, dock: &mut Vec<Vec<T>>) -> () {
-        for _ in 0..self.crates {
-            let item = dock[self.from - 1].pop().unwrap();
-            dock[self.to - 1].push(item);
-        }
+    pub fn apply<T>(&self, dock: &mut Vec<Vec<T>>, model: Model) -> () {
+        match model {
+            Model::CrateMover9000 => {
+                for _ in 0..self.crates {
+                    let item = dock[self.from - 1].pop().unwrap();
+                    dock[self.to - 1].push(item);
+                }
+            }
+
+            Model::CrateMover9001 => {
+                let at = dock[self.from - 1].len() - self.crates;
+                let mut items = dock[self.from - 1].split_off(at);
+                dock[self.to - 1].append(&mut items);
+            }
+        };
     }
 }
 
@@ -71,7 +86,7 @@ mod tests {
     }
 
     #[test]
-    fn crane() {
+    fn crane9000() {
         let mut dock: Vec<Vec<char>> = vec![vec!['A', 'B', 'C'], vec![]];
 
         Crane {
@@ -79,7 +94,7 @@ mod tests {
             from: 1,
             to: 2,
         }
-        .apply(&mut dock);
+        .apply(&mut dock, Model::CrateMover9000);
 
         assert_eq!(dock[0], vec!['A']);
         assert_eq!(dock[1], vec!['C', 'B']);
@@ -89,9 +104,34 @@ mod tests {
             from: 2,
             to: 1,
         }
-        .apply(&mut dock);
+        .apply(&mut dock, Model::CrateMover9000);
 
         assert_eq!(dock[0], vec!['A', 'B']);
         assert_eq!(dock[1], vec!['C']);
+    }
+
+    #[test]
+    fn crane9001() {
+        let mut dock: Vec<Vec<char>> = vec![vec!['A', 'B', 'C'], vec![]];
+
+        Crane {
+            crates: 2,
+            from: 1,
+            to: 2,
+        }
+        .apply(&mut dock, Model::CrateMover9001);
+
+        assert_eq!(dock[0], vec!['A']);
+        assert_eq!(dock[1], vec!['B', 'C']);
+
+        Crane {
+            crates: 1,
+            from: 2,
+            to: 1,
+        }
+        .apply(&mut dock, Model::CrateMover9001);
+
+        assert_eq!(dock[0], vec!['A', 'C']);
+        assert_eq!(dock[1], vec!['B']);
     }
 }
