@@ -1,0 +1,50 @@
+use std::str::FromStr;
+
+use crate::error::ParseError;
+
+type Filename = String;
+type Size = u32;
+
+#[derive(Debug, PartialEq)]
+pub enum Inode {
+    Directory,
+    File(Filename, Size),
+}
+
+impl FromStr for Inode {
+    type Err = ParseError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        if let Some((inode, file)) = input.trim().split_once(' ') {
+            match inode {
+                // We don't really care about directories
+                "dir" => Ok(Inode::Directory),
+
+                // We only care about files (i.e., leaves)
+                _ => {
+                    let filename: String = file.into();
+                    let size: u32 = inode.parse().ok().ok_or(ParseError)?;
+
+                    Ok(Inode::File(filename, size))
+                }
+            }
+        } else {
+            Err(ParseError)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn inode() {
+        assert_eq!("dir abc".parse::<Inode>().unwrap(), Inode::Directory);
+
+        assert_eq!(
+            "123 xyz".parse::<Inode>().unwrap(),
+            Inode::File(String::from("xyz"), 123)
+        );
+    }
+}
