@@ -6,7 +6,7 @@ impl FromStr for Assignment {
     type Err = std::num::ParseIntError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let (from, to) = input.split_once("-").unwrap();
+        let (from, to) = input.split_once('-').unwrap();
         Ok(Assignment(from.parse::<u32>()?, to.parse::<u32>()?))
     }
 }

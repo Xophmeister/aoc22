@@ -47,7 +47,7 @@ impl FromStr for Crane {
 }
 
 impl Crane {
-    pub fn apply<T>(&self, dock: &mut Vec<Vec<T>>, model: Model) -> () {
+    pub fn apply<T>(&self, dock: &mut [Vec<T>], model: Model) {
         match model {
             Model::CrateMover9000 => {
                 for _ in 0..self.crates {

@@ -19,13 +19,12 @@ fn update_dock(dock: &mut Dock, input: &str) -> Result<(), ParseError> {
         }
     }
 
-    for stack in 0..stacks {
-        // Index = (Stack * 4) + 1
-        let idx: usize = (stack * 4) + 1;
+    for (stack_idx, stack) in dock.iter_mut().enumerate().take(stacks) {
+        let idx: usize = (stack_idx * 4) + 1;
         let item = input.as_bytes()[idx] as char;
 
         match item {
-            'A'..='Z' => dock[stack].push(item),
+            'A'..='Z' => stack.push(item),
             _ => continue,
         }
     }

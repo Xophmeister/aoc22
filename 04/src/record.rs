@@ -7,7 +7,7 @@ impl FromStr for Record {
     type Err = std::num::ParseIntError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let (a, b) = input.split_once(",").unwrap();
+        let (a, b) = input.split_once(',').unwrap();
         Ok(Record(a.parse::<Assignment>()?, b.parse::<Assignment>()?))
     }
 }

@@ -8,7 +8,7 @@ pub struct Round {
 
 impl Round {
     pub fn new(encoded: &str) -> Self {
-        if let Some((opponent, strategy)) = encoded.trim().split_once(" ") {
+        if let Some((opponent, strategy)) = encoded.trim().split_once(' ') {
             Round {
                 opponent: Hand::new(opponent),
                 strategy: Strategy::new(strategy),

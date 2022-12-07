@@ -5,7 +5,7 @@ mod parse;
 use crate::crane::Model;
 use crate::parse as input;
 
-fn read_stacks(dock: &Vec<Vec<char>>) -> String {
+fn read_stacks(dock: &[Vec<char>]) -> String {
     dock.iter()
         .map(|stack| stack.iter().last().unwrap())
         .collect::<String>()

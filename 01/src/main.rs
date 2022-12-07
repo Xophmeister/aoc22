@@ -49,7 +49,7 @@ fn main() {
     }
 
     // Sum the top three elves' calories
-    calories.sort();
+    calories.sort_unstable();
     match &calories[..] {
         [.., a, b, c] => println!("{}", a + b + c),
         _ => panic!("Not enough elves"),
