@@ -1,4 +1,5 @@
 use std::fmt;
+use std::io;
 use std::num::ParseIntError;
 
 pub struct ParseError;
@@ -19,6 +20,12 @@ impl fmt::Debug for ParseError {
 
 impl From<ParseIntError> for ParseError {
     fn from(_error: ParseIntError) -> Self {
+        ParseError
+    }
+}
+
+impl From<io::Error> for ParseError {
+    fn from(_error: io::Error) -> Self {
         ParseError
     }
 }

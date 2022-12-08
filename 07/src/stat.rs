@@ -51,21 +51,14 @@ impl Stat {
         let mut cwd = PathBuf::from("/");
         let mut stats: Vec<Stat> = Vec::new();
 
-        loop {
-            match stdin.read_line(&mut line) {
-                Err(_) => return Err(ParseError),
-                Ok(0) => break,
-
-                Ok(_) => {
-                    if line.starts_with('$') {
-                        // Parse command
-                        parse_cmd(&line[2..], &mut cwd)?;
-                    } else {
-                        // Parse directory listing
-                        let inode: Inode = line.parse()?;
-                        stats.push(Stat(cwd.clone(), inode));
-                    }
-                }
+        while stdin.read_line(&mut line)? != 0 {
+            if let Some(cmd) = line.strip_prefix("$ ") {
+                // Parse command
+                parse_cmd(cmd, &mut cwd)?;
+            } else {
+                // Parse directory listing
+                let inode: Inode = line.parse()?;
+                stats.push(Stat(cwd.clone(), inode));
             }
 
             line.clear()
