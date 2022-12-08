@@ -15,21 +15,19 @@ impl FromStr for Inode {
     type Err = ParseError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        if let Some((inode, file)) = input.trim().split_once(' ') {
-            match inode {
-                // We don't really care about directories
-                "dir" => Ok(Inode::Directory),
+        let (inode, file) = input.trim().split_once(' ').ok_or(ParseError)?;
 
-                // We only care about files (i.e., leaves)
-                _ => {
-                    let filename: String = file.into();
-                    let size: u32 = inode.parse().ok().ok_or(ParseError)?;
+        match inode {
+            // We don't really care about directories
+            "dir" => Ok(Inode::Directory),
 
-                    Ok(Inode::File(filename, size))
-                }
+            // We only care about files (i.e., leaves)
+            _ => {
+                let filename: String = file.into();
+                let size: u32 = inode.parse()?;
+
+                Ok(Inode::File(filename, size))
             }
-        } else {
-            Err(ParseError)
         }
     }
 }
@@ -39,12 +37,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn inode() {
-        assert_eq!("dir abc".parse::<Inode>().unwrap(), Inode::Directory);
+    fn inode() -> Result<(), ParseError> {
+        assert_eq!("dir abc".parse::<Inode>()?, Inode::Directory);
 
         assert_eq!(
-            "123 xyz".parse::<Inode>().unwrap(),
+            "123 xyz".parse::<Inode>()?,
             Inode::File(String::from("xyz"), 123)
         );
+
+        Ok(())
     }
 }

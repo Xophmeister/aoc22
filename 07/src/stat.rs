@@ -61,7 +61,7 @@ impl Stat {
                         parse_cmd(&line[2..], &mut cwd)?;
                     } else {
                         // Parse directory listing
-                        let inode: Inode = line.parse().ok().ok_or(ParseError)?;
+                        let inode: Inode = line.parse()?;
                         stats.push(Stat(cwd.clone(), inode));
                     }
                 }
