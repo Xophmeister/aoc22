@@ -1,3 +1,4 @@
+use std::fmt;
 use std::io;
 use std::path::PathBuf;
 
@@ -71,5 +72,20 @@ impl Stat {
         }
 
         Ok(stats)
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.1 != Inode::Directory
+    }
+}
+
+impl fmt::Display for Stat {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let dir: &str = self.0.to_str().unwrap_or("???");
+
+        match &self.1 {
+            Inode::Directory => write!(f, "{}", dir),
+            Inode::File(filename, size) => write!(f, "{}\t{}\t{}", dir, filename, size),
+        }
     }
 }

@@ -3,7 +3,6 @@ mod inode;
 mod stat;
 
 use crate::error::ParseError;
-use crate::inode::Inode;
 use crate::stat::Stat;
 
 fn main() -> Result<(), ParseError> {
@@ -11,8 +10,8 @@ fn main() -> Result<(), ParseError> {
 
     stats
         .iter()
-        .filter(|stat| stat.1 != Inode::Directory)
-        .for_each(|stat| println!("{:?}", stat));
+        .filter(|stat| stat.is_file())
+        .for_each(|stat| println!("{stat}"));
 
     Ok(())
 }
