@@ -1,6 +1,6 @@
 use std::fmt;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::error::ParseError;
 use crate::inode::Inode;
@@ -67,8 +67,27 @@ impl Stat {
         Ok(stats)
     }
 
+    pub fn path(&self) -> &PathBuf {
+        &self.0
+    }
+
     pub fn is_file(&self) -> bool {
         self.1 != Inode::Directory
+    }
+
+    // Well this is gross :/
+    pub fn is_under(&self, parent: &Path) -> bool {
+        let dir: Vec<_> = self.0.components().collect();
+        let parent: Vec<_> = parent.components().collect();
+
+        (parent.len() <= dir.len()) && parent.iter().zip(dir.iter()).all(|(a, b)| a == b)
+    }
+
+    pub fn get_size(&self) -> u32 {
+        match self.1 {
+            Inode::File(_, size) => size,
+            _ => 0,
+        }
     }
 }
 
