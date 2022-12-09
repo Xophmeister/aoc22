@@ -18,18 +18,22 @@ fn main() {
 fn run() -> Result<(), ParseError> {
     let stats = Stat::parse_session()?;
 
-    let files = stats.iter().filter(|stat| stat.is_file());
-    let directories: HashSet<&PathBuf> = HashSet::from_iter(files.map(|stat| stat.path()));
+    // Unique directories attested in session
+    let directories: HashSet<&PathBuf> = HashSet::from_iter(stats.iter().map(|stat| stat.path()));
 
-    for dir in directories {
-        let dir_size: u32 = stats
-            .iter()
-            .filter(|stat| stat.is_file() && stat.is_under(dir))
-            .map(|stat| stat.get_size())
-            .sum();
+    let part_a: u32 = directories
+        .iter()
+        .map(|directory| {
+            stats
+                .iter()
+                .filter(|stat| stat.is_file() && stat.is_under(directory))
+                .map(|stat| stat.get_size())
+                .sum()
+        })
+        .filter(|size: &u32| *size <= 100000)
+        .sum();
 
-        println!("{}\t{}", dir.to_str().unwrap(), dir_size);
-    }
+    println!("Part 1: {part_a}");
 
     Ok(())
 }
