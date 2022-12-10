@@ -1,14 +1,11 @@
 use std::io;
 
-use crate::error::ParseError;
-
-type Tree = isize;
+type Tree = isize; // signed because we use -1 as a default
 type Row = Vec<Tree>;
 type Column = Row;
 type Matrix = Vec<Row>;
 
-#[derive(Debug)]
-pub struct Grid(Matrix);
+pub struct Forest(Matrix);
 
 /// Decode character code to height
 fn decode(c: char) -> Tree {
@@ -16,7 +13,7 @@ fn decode(c: char) -> Tree {
 }
 
 /// Return a slice of a slice up to (and including) elements that are less than, or equal to some
-/// value (which can't be done with Iterator::take_until)
+/// value (which can't be done with Iterator::take_until); or the whole slice, if not found
 fn take_until_obscured<T: PartialOrd>(needle: T, haystack: &[T]) -> &[T] {
     let index = haystack.iter().position(|element| *element >= needle);
 
@@ -26,21 +23,21 @@ fn take_until_obscured<T: PartialOrd>(needle: T, haystack: &[T]) -> &[T] {
     }
 }
 
-impl Grid {
-    pub fn parse() -> Result<Self, ParseError> {
+impl Forest {
+    pub fn parse() -> Result<Self, io::Error> {
         let stdin = io::stdin();
         let mut line = String::new();
 
-        let mut grid: Matrix = Vec::new();
+        let mut trees: Matrix = Vec::new();
 
         while stdin.read_line(&mut line)? != 0 {
             let row: Row = line.trim().chars().map(decode).collect();
-            grid.push(row);
+            trees.push(row);
 
             line.clear()
         }
 
-        Ok(Grid(grid))
+        Ok(Forest(trees))
     }
 
     fn rows(&self) -> &Matrix {
@@ -52,6 +49,7 @@ impl Grid {
     }
 
     fn column(&self, i: usize) -> Column {
+        // NOTE This is grossly inefficient; better to compute the columns once, at parse time.
         self.rows().iter().map(|row| row[i]).collect::<Column>()
     }
 
@@ -68,6 +66,8 @@ impl Grid {
         let west = &self.row(j)[..i];
 
         // NOTE north and west are reversed, so they radiate outwards from (i, j)
+        // This also leads to unnecessary allocations; better to tag their read direction with an
+        // enum (e.g., Forward(&[T]) and Reverse(&[T])
         [
             {
                 let mut north = north.to_vec();
@@ -87,6 +87,8 @@ impl Grid {
     fn size(&self) -> (usize, usize) {
         (self.rows()[0].len(), self.rows().len())
     }
+
+    // Part 1
 
     fn is_visible(&self, i: usize, j: usize) -> bool {
         let height = self.tree(i, j);
@@ -112,7 +114,9 @@ impl Grid {
         visible
     }
 
-    pub fn scenery(&self, i: usize, j: usize) -> u32 {
+    // Part 2
+
+    fn scenery(&self, i: usize, j: usize) -> u32 {
         let height = self.tree(i, j);
 
         self.orthogonal(i, j)

@@ -1,8 +1,8 @@
-mod error;
-mod parse;
+mod forest;
 
-use crate::error::ParseError;
-use crate::parse::Grid;
+use std::io;
+
+use crate::forest::Forest;
 
 fn main() {
     if let Err(e) = run() {
@@ -11,8 +11,8 @@ fn main() {
     }
 }
 
-fn run() -> Result<(), ParseError> {
-    let trees = Grid::parse()?;
+fn run() -> Result<(), io::Error> {
+    let trees = Forest::parse()?;
 
     println!("Part 1: {}", trees.visible());
     println!("Part 2: {}", trees.scenic_score());
