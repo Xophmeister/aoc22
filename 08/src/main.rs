@@ -15,6 +15,7 @@ fn run() -> Result<(), ParseError> {
     let trees = Grid::parse()?;
 
     println!("Part 1: {}", trees.visible());
+    println!("Part 2: {}", trees.scenic_score());
 
     Ok(())
 }
