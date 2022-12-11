@@ -3,10 +3,10 @@ use std::io;
 use crate::error::Error;
 
 pub enum Move {
-    Right(usize),
-    Up(usize),
-    Left(usize),
-    Down(usize),
+    Right,
+    Up,
+    Left,
+    Down,
 }
 
 impl Move {
@@ -20,14 +20,16 @@ impl Move {
             let (direction, distance) = line.trim().split_once(' ').ok_or(Error::ParseError)?;
             let distance: usize = distance.parse()?;
 
-            moves.push(match direction {
-                "R" => Self::Right(distance),
-                "U" => Self::Up(distance),
-                "L" => Self::Left(distance),
-                "D" => Self::Down(distance),
+            for _ in 0..distance {
+                moves.push(match direction {
+                    "R" => Self::Right,
+                    "U" => Self::Up,
+                    "L" => Self::Left,
+                    "D" => Self::Down,
 
-                _ => return Err(Error::ParseError),
-            });
+                    _ => return Err(Error::ParseError),
+                });
+            }
 
             line.clear();
         }
