@@ -1,14 +1,14 @@
 use crate::moves::Move;
 
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-pub struct RopeEnd(isize, isize);
+pub struct Knot(isize, isize);
 
-impl RopeEnd {
+impl Knot {
     pub fn new() -> Self {
-        RopeEnd(0, 0)
+        Knot(0, 0)
     }
 
-    pub fn movement(&mut self, movement: Move) {
+    pub fn travel(&mut self, movement: Move) {
         match movement {
             Move::Right(distance) => self.0 += distance as isize,
             Move::Up(distance) => self.1 += distance as isize,
@@ -21,11 +21,11 @@ impl RopeEnd {
         let (x, y) = (self.0, self.1);
         let (i, j) = (other.0, other.1);
 
-        i >= x - 1 && i <= x + 1 && j >= y - 1 && j <= y + 1
+        (x - i).abs() <= 1 && (y - j).abs() <= 1
     }
 
-    pub fn follow(&mut self, other: &Self) -> Vec<RopeEnd> {
-        let mut locations: Vec<RopeEnd> = vec![*self];
+    pub fn follow(&mut self, other: &Self) -> Vec<Knot> {
+        let mut locations: Vec<Knot> = vec![*self];
 
         while !self.is_stable(other) {
             let delta_x = other.0 - self.0;
