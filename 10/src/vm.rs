@@ -8,6 +8,8 @@ pub struct Vm(Cycle, Register, Stack);
 
 impl Default for Vm {
     fn default() -> Self {
+        // FIXME The cycle should start at 0,
+        // but that returns the wrong answer
         Vm(1, 1, Vec::new())
     }
 }

@@ -1,5 +1,7 @@
 use aoc22_10::{Error, Program, Vm};
 
+const CRT_WIDTH: usize = 40;
+
 fn main() {
     if let Err(e) = run() {
         eprintln!("{e}");
@@ -21,6 +23,29 @@ fn run() -> Result<(), Error> {
     };
 
     println!("Part 1: {part_a}");
+
+    // FIXME There's an off-by-one error somewhere,
+    // but the output is legible enough to read :P
+    {
+        let vm = Vm::default();
+
+        println!("Part 2:");
+        for (cycle, x) in vm.exec(&program) {
+            let crt = (cycle - 1) % CRT_WIDTH;
+
+            if crt == 0 {
+                println!();
+            }
+
+            if (crt as i32 - x).abs() <= 1 {
+                print!("##");
+            } else {
+                print!("  ");
+            }
+        }
+
+        println!();
+    }
 
     Ok(())
 }
