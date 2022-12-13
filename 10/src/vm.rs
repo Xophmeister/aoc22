@@ -8,9 +8,7 @@ pub struct Vm(Cycle, Register, Stack);
 
 impl Default for Vm {
     fn default() -> Self {
-        // FIXME The cycle should start at 0,
-        // but that returns the wrong answer
-        Vm(1, 1, Vec::new())
+        Vm(0, 1, Vec::new())
     }
 }
 
@@ -48,6 +46,7 @@ impl Iterator for Execution {
     fn next(&mut self) -> Option<Self::Item> {
         // Increase the cycle count
         self.vm.0 += 1;
+        let original_x = self.vm.1;
 
         // Mutate register
         if let Some(Isa::AddX(value)) = self.todo {
@@ -60,6 +59,7 @@ impl Iterator for Execution {
             return None;
         }
 
-        Some((self.vm.0, self.vm.1))
+        // We return the register value "during" the cycle, not after
+        Some((self.vm.0, original_x))
     }
 }

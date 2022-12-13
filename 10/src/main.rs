@@ -24,28 +24,23 @@ fn run() -> Result<(), Error> {
 
     println!("Part 1: {part_a}");
 
-    // FIXME There's an off-by-one error somewhere,
-    // but the output is legible enough to read :P
-    {
+    let part_b: String = {
         let vm = Vm::default();
 
-        println!("Part 2:");
-        for (cycle, x) in vm.exec(&program) {
-            let crt = (cycle - 1) % CRT_WIDTH;
+        vm.exec(&program)
+            .fold(String::new(), |display, (cycle, x)| {
+                let crt = (cycle - 1) % CRT_WIDTH;
+                let eol = if crt == CRT_WIDTH - 1 { "\n" } else { "" };
 
-            if crt == 0 {
-                println!();
-            }
+                if (crt as i32 - x).abs() <= 1 {
+                    format!("{display}##{eol}")
+                } else {
+                    format!("{display}  {eol}")
+                }
+            })
+    };
 
-            if (crt as i32 - x).abs() <= 1 {
-                print!("##");
-            } else {
-                print!("  ");
-            }
-        }
-
-        println!();
-    }
+    print!("Part 2:\n{part_b}");
 
     Ok(())
 }
