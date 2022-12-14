@@ -1,6 +1,6 @@
 use std::io;
 
-use aoc22_11::Troop;
+use aoc22_11::{Troop, Value};
 
 fn main() {
     if let Err(e) = run() {
@@ -10,22 +10,31 @@ fn main() {
 }
 
 fn run() -> Result<(), io::Error> {
+    // NOTE Default worry level is 1
     let mut troop = Troop::parse(io::stdin())?;
 
-    for _ in 0..20 {
-        troop.round();
-    }
+    let part_a: Value = {
+        let mut troop = troop.clone();
+        *troop.worry_level() = 3;
 
-    let part_a: u32 = {
-        let mut inspections = troop.inspections();
-        inspections.sort_by(|a, b| b.partial_cmp(a).unwrap());
+        for _round in 0..20 {
+            troop.play();
+        }
 
-        inspections
-            .iter()
-            .take(2)
-            .fold(1, |acc, &count| acc * count as u32)
+        troop.monkey_business()
     };
+
     println!("Part 1: {part_a}");
+
+    let part_b: Value = {
+        for _round in 0..10000 {
+            troop.play();
+        }
+
+        troop.monkey_business()
+    };
+
+    println!("Part 2: {part_b}");
 
     Ok(())
 }
