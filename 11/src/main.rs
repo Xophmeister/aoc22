@@ -10,15 +10,14 @@ fn main() {
 }
 
 fn run() -> Result<(), io::Error> {
-    // NOTE Default worry level is 1
     let mut troop = Troop::parse(io::stdin())?;
 
     let part_a: Value = {
         let mut troop = troop.clone();
-        *troop.worry_level() = 3;
+        let worry_level = 3;
 
         for _round in 0..20 {
-            troop.play();
+            troop.play(worry_level);
         }
 
         troop.monkey_business()
@@ -27,8 +26,10 @@ fn run() -> Result<(), io::Error> {
     println!("Part 1: {part_a}");
 
     let part_b: Value = {
+        let worry_level = 1;
+
         for _round in 0..10000 {
-            troop.play();
+            troop.play(worry_level);
         }
 
         troop.monkey_business()

@@ -58,21 +58,19 @@ impl Monkey {
 #[derive(Clone)]
 pub struct Troop(
     Vec<Monkey>,
-    Value, // Worry value
     Value, // Modulo, for Chinese Remainder Theorem
 );
 
 impl Troop {
-    // .split_at_mut is a PITA, so I role my own
+    // .split_at_mut is a PITA, so let's throw caution to the wind...
     fn trio(&mut self, thrower: usize) -> (&mut Monkey, &mut Monkey, &mut Monkey) {
         let ptr = self.0.as_mut_ptr();
 
         unsafe {
-            let see = &mut *ptr.add(thrower);
-            let hear = &mut *ptr.add(see.if_true);
-            let say = &mut *ptr.add(see.if_false);
+            let see = &mut *ptr.add(thrower); // Thrower Monkey
+            let hear = &mut *ptr.add(see.if_true); // True Catcher Monkey
+            let say = &mut *ptr.add(see.if_false); // False Catcher Monkey
 
-            // (Thrower, True Catcher, False Catcher)
             (see, hear, say)
         }
     }
@@ -84,7 +82,7 @@ impl Troop {
 
         if let Ok((_, monkeys)) = parse::troop(buffer.as_str()) {
             let modulo = monkeys.iter().map(|monkey| monkey.divisor).product();
-            Ok(Troop(monkeys, 1, modulo))
+            Ok(Troop(monkeys, modulo))
         } else {
             Err(io::Error::new(
                 io::ErrorKind::InvalidData,
@@ -93,16 +91,10 @@ impl Troop {
         }
     }
 
-    /// Getter/setter for worry value
-    pub fn worry_level(&mut self) -> &mut Value {
-        &mut self.1
-    }
-
-    /// Perform a single round of Keep Away
-    pub fn play(&mut self) {
+    /// Perform a single round of Keep Away at the given worry level
+    pub fn play(&mut self, worry: Value) {
         let monkeys = self.0.len();
-        let worry = self.1;
-        let modulo = self.2;
+        let modulo = self.1;
 
         for idx in 0..monkeys {
             let (see, hear, say) = self.trio(idx);
