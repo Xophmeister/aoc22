@@ -1,13 +1,30 @@
 use std::io::stdin;
+use std::ops::Sub;
 
 use crate::error::Error;
 
 #[derive(Clone, Copy)]
-struct Elevation(u8);
+pub struct Elevation(u8);
 
 impl From<char> for Elevation {
     fn from(input: char) -> Self {
         Elevation(input as u8 - b'a')
+    }
+}
+
+pub struct Delta(i8);
+
+impl Delta {
+    pub fn assailable(&self) -> bool {
+        self.0.abs() <= 1
+    }
+}
+
+impl Sub for Elevation {
+    type Output = Delta;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Delta(self.0 as i8 - rhs.0 as i8)
     }
 }
 
@@ -24,17 +41,10 @@ impl Coord {
     }
 }
 
-pub enum Direction {
-    North,
-    South,
-    East,
-    West,
-}
-
 pub struct Map {
-    field: (Vec<Elevation>, usize),
-    start: Coord,
-    end: Coord,
+    field: (Vec<Elevation>, usize, usize),
+    pub start: Coord,
+    pub end: Coord,
 }
 
 impl Map {
@@ -81,26 +91,21 @@ impl Map {
         }
 
         Ok(Map {
-            field: (field, width.ok_or(Error::ParseError)?),
+            field: (field, width.ok_or(Error::ParseError)?, y),
             start: start.ok_or(Error::ParseError)?,
             end: end.ok_or(Error::ParseError)?,
         })
     }
 
-    fn size(&self) -> Coord {
-        let (field, width) = &self.field;
-        Coord(*width, field.len() / *width)
+    pub fn size(&self) -> Coord {
+        let (_, width, height) = self.field;
+        Coord(width, height)
     }
 
-    fn elevation(&self, at: Coord) -> Elevation {
-        let (field, width) = &self.field;
-        let idx = at.x() + (at.y() * width);
-        field[idx]
-    }
+    pub fn elevation(&self, at: Coord) -> Elevation {
+        let (field, width, height) = &self.field;
+        assert!(at.x() < *width && at.y() < *height);
 
-    pub fn routes(&self, from: Coord) -> Vec<Direction> {
-        let elevation = self.elevation(from);
-
-        todo!();
+        field[at.x() + (at.y() * width)]
     }
 }

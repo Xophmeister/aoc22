@@ -1,6 +1,5 @@
 use std::fmt;
 use std::io;
-use std::num::ParseIntError;
 
 #[derive(Debug)]
 pub enum Error {
@@ -16,12 +15,6 @@ impl fmt::Display for Error {
             Self::IOError(reason) => write!(f, "IO error: {reason}"),
             Self::ParseError => write!(f, "Parse error: Couldn't parse input"),
         }
-    }
-}
-
-impl From<ParseIntError> for Error {
-    fn from(_: ParseIntError) -> Self {
-        Self::ParseError
     }
 }
 
