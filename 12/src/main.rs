@@ -1,4 +1,4 @@
-use aoc22_12::{Error, Map};
+use aoc22_12::{Error, Map, Route};
 
 fn main() {
     if let Err(e) = run() {
@@ -10,7 +10,8 @@ fn main() {
 fn run() -> Result<(), Error> {
     let map = Map::parse()?;
 
-    //println!("{} x {}", map.size().x(), map.size().y());
+    let route = Route::try_from(&map)?;
+    println!("Part 1: {}", route.len());
 
     Ok(())
 }

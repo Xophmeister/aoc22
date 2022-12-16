@@ -1,3 +1,4 @@
+use std::fmt;
 use std::io::stdin;
 use std::ops::Sub;
 
@@ -8,7 +9,7 @@ pub struct Elevation(u8);
 
 impl From<char> for Elevation {
     fn from(input: char) -> Self {
-        Elevation(input as u8 - b'a')
+        Self(input as u8 - b'a')
     }
 }
 
@@ -28,23 +29,22 @@ impl Sub for Elevation {
     }
 }
 
-#[derive(Clone, Copy)]
-pub struct Coord(usize, usize);
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Coord {
+    pub x: usize,
+    pub y: usize,
+}
 
-impl Coord {
-    pub fn x(self) -> usize {
-        self.0
-    }
-
-    pub fn y(self) -> usize {
-        self.1
+impl fmt::Display for Coord {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
 
 pub struct Map {
     field: (Vec<Elevation>, usize, usize),
     pub start: Coord,
-    pub end: Coord,
+    pub finish: Coord,
 }
 
 impl Map {
@@ -74,12 +74,12 @@ impl Map {
 
                     'S' => {
                         field.push('a'.into());
-                        start = Some(Coord(x, y));
+                        start = Some(Coord { x, y });
                     }
 
                     'E' => {
                         field.push('z'.into());
-                        end = Some(Coord(x, y));
+                        end = Some(Coord { x, y });
                     }
 
                     _ => return Err(Error::ParseError),
@@ -90,22 +90,22 @@ impl Map {
             line.clear();
         }
 
-        Ok(Map {
+        Ok(Self {
             field: (field, width.ok_or(Error::ParseError)?, y),
             start: start.ok_or(Error::ParseError)?,
-            end: end.ok_or(Error::ParseError)?,
+            finish: end.ok_or(Error::ParseError)?,
         })
     }
 
     pub fn size(&self) -> Coord {
-        let (_, width, height) = self.field;
-        Coord(width, height)
+        let (_, x, y) = self.field;
+        Coord { x, y }
     }
 
     pub fn elevation(&self, at: Coord) -> Elevation {
         let (field, width, height) = &self.field;
-        assert!(at.x() < *width && at.y() < *height);
+        assert!(at.x < *width && at.y < *height);
 
-        field[at.x() + (at.y() * width)]
+        field[at.x + (at.y * width)]
     }
 }
